@@ -26,6 +26,6 @@ else
     if utilidades == 0
         puts "SIN ULTILIDADES"
     else
-        puts "UTILIDADES"
+        puts "UTILIDADES NEGATIVAS"
     end
 end

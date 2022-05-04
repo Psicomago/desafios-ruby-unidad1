@@ -25,9 +25,9 @@ if utilidades > 0
     puts "tus utilidades netas serán $ #{utilidad_neta}"
 else
     if utilidades == 0  
-        puts "no hubo utilidades" 
+        puts "SIN UTILIDADES" 
     else
-        puts "utilidades negativas"
+        puts "UTILIDADES NEGATIVAS"
     end
 end
 

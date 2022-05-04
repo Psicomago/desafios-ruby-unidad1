@@ -115,29 +115,26 @@ def numero_0(n)
 end
 #metodo navidad
 def navidad(n)
+    n += 1 if n.even? #en caso de que el argumento sea para, agregamos 1 a n para respetar simetria
     centro = (n / 2).to_i
     mitadsup = centro + 1
     mitadinf = n - mitadsup
     eje_y_izq = centro
     eje_y_der = centro
-    asteriscos = 1
+    asterisco = eje_y_izq
     mitadsup.times do |fila|
         #mitad superior
-        asteriscos = fila + 1
+        asterisco = eje_y_izq
         (n).times do |x|
             if ((eje_y_izq == eje_y_der) && (x == eje_y_izq && x == eje_y_der))
                print "*"
-                
             else
-            
-                if (x == eje_y_izq || x == eje_y_der) #x == (eje_y_izq + 2) ) #||  (x == eje_y_der || x == eje_y_der)
+                if x == asterisco && asterisco <= eje_y_der
                     print "*"
+                    asterisco += 2
                 else
                     print " "
                 end
-            #     #     print "(fila #{fila} , #{eje_y_izq}) valor x == #{x} , derecha (fila #{fila}, #{eje_y_der}) == #{x}"
-            #     # else
-            #     # end
             end
         end
         eje_y_izq -= 1
@@ -146,8 +143,31 @@ def navidad(n)
     end
     #mitad inferior
     mitadinf.times do |fila|
-        # if fila == (n - 1)
-        #     print
+        #eje_y_izq = (centro / 2).to_i
+        if centro.even?
+            eje_y_izq = 2
+            eje_y_der = (n - 2)
+        else
+            eje_y_izq = 1
+            eje_y_der = (n-1)
+        end
+        n.times do |x|
+            if fila == (mitadinf - 1) 
+                if x == eje_y_izq && x <= eje_y_der 
+                    print "*"
+                    eje_y_izq += 2
+                else
+                    print " "
+                end
+            else
+                if x == centro
+                    print "*"
+                else
+                    print " "
+                end
+            end
+        end
+        print "\n"
     end
 end
 

@@ -145,8 +145,13 @@ def navidad(n)
     mitadinf.times do |fila|
         #eje_y_izq = (centro / 2).to_i
         if centro.even?
-            eje_y_izq = 2
-            eje_y_der = (n - 2)
+            if n == 5
+                eje_y_izq = 1
+                eje_y_der = (n - 1)
+            else
+                eje_y_izq = 2
+                eje_y_der = (n - 2)
+            end
         else
             eje_y_izq = 1
             eje_y_der = (n-1)

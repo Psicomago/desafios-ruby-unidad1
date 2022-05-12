@@ -12,3 +12,11 @@ n3 = ARGV[2].to_i
 n1 > n2 ? m = n1 : m = n2
 m = n3 if n3 > m
 puts "el numero mayor es #{m}"
+
+=begin
+    como dato, puedes crear un array y poner los ARGV[x] que necesites en el, asi:
+    array = [ARGV[0],ARGV[1],ARGV[2]]
+    y luego usar un metodo de la clase array que determina el numero mayor en asi, por lo que el codigo final quedaria asi:
+    array = [ARGV[0],ARGV[1],ARGV[2]]
+puts array.max
+=end

@@ -30,5 +30,5 @@ file = 'notas.data'
 #llamar metodos
 dataFile = readFile(file)
 arrayEnd = notas_mas_alta(dataFile)
-#probar output
+#probar output - entrega lo que se grabó en el archivo
 print arrayEnd

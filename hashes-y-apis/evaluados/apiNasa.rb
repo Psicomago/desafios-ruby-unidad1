@@ -16,44 +16,32 @@ def request(urlRequest, keyRequest)
   result = JSON.parse(response.read_body)
 end
 
+# obtiene asigna apiKey del usuario
 def keyRequest(apiKeySecret)
   passKey = apiKeySecret
 end
 
 # filtrar data por el tipo de camara
-def filterData(dataJob,typeCamera) 
+def filterData(dataJob,typeCameras) 
   cameras = []
-  ind = 0
-  #prueba recorriendo el hash
-  dataJob.each do |ele|
-    byebug
-   if dataJob["photos"][ind]["camera"]["name"] == typeCamera
-    cameras.push(dataJob["photos"][ind])
-    #  cameras.push{
-    #    "id" => ind,
-    #    "nameCam" => name,
-    #    "fullNameCam" => full_name,
-    #    "earthDateCam" => earth_date,
-    #    "launchDateCam" => launch_date,
-    #    "imageCam" => img_src
-    #  }     
-   end
-    #cameras.push() #if ['photos'][i]['camera']['name': value] == "FHAZ"
-    #print "soy ele #{ele} \n"#"soy data job #{dataJob['photos'][0]['camera']} /n" 
-    ind += 1
+  idx = 1
+  dataJob["photos"].each do |ele| #["photos"][idx] != nil?
+    if ele["camera"]["name"] == typeCameras
+      cameras.push([idx], ele["camera"]["name"], ele["camera"]["full_name"], ele["img_src"], ele["earth_date"])
+      idx += 1
+      byebug
+    end 
   end
   return cameras
 end
 
+#construye la pagina index.html
 def build_web_pages
-  pagesIndex = Array.new
-  pagesIndex = build_Html #asigna el resultado de build_html a pagesIndex
-  pagesIndex = build_Head(pagesIndex)
-  pagesIndex = build_Body(pagesIndex)
-
-  build_Index(pagesIndex)
-  # puts "construyendo html"
-  # puts pagesIndex
+  pagesIndex = []
+  pagesIndex = build_Html #asigna el resultado del método build_html a pagesIndex
+  pagesIndex = build_Head(pagesIndex) #asigna a pages index el retorno del metodo buildHead
+  pagesIndex = build_Body(pagesIndex) #asigna a pages index el retorno del metodo buildBody
+  build_Index(pagesIndex) #
   return pagesIndex
 
 end
@@ -64,10 +52,6 @@ def build_Html
   return htmlArrays
 end
 
-#abre archivos como arreglos
-def openFileAsArray(file)
-  dataFile = open(file).read.chomp.split(",")
-end
 #Construye el head tradicional
 def build_Head(headArrays)
   headArrays.push("<head>")
@@ -81,8 +65,6 @@ def build_Head(headArrays)
   headArrays.push("\s\s<link rel=\"icon\" href=\"https://www.nasa.gov/sites/all/themes/custom/nasatwo/images/nasa-logo.svg\">")
   headArrays.push("\s\s<title>Api-Nasa</title>")
   headArrays.push("</head>")
-   #<script src="https://kit.fontawesome.com/35207aa8d7.js" crossorigin="anonymous"></script>
-
 end
 
 #construye el body del htmal
@@ -95,17 +77,12 @@ def build_Body(bodyArrays)
   bodyArrays.push("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js\"></script>")
   bodyArrays.push("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js\"></script>")
   bodyArrays.push("<script src=\"https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js\"></script>")
-  
 end
 
 #constuye el header de la pagina
 def build_Header(headerArrays)
-  headerArrays.push("\s\s<header>")
+  headerArrays.push("\s\s<header class=\"bg-dark\">")
   headerArrays.push("\s\s<h1>FOTGRAFIAS API NASAS>")
-  imagen1 = "http://mars.jpl.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/01000/opgs/edr/rcam/RLB_486265291EDR_F0481570RHAZ00323M_.JPG"
-  imagen2 = "http://mars.jpl.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/01000/opgs/edr/fcam/FLB_486265257EDR_F0481570FHAZ00323M_.JPG"
-  imagen3 = "http://mars.jpl.nasa.gov/msl-raw-images/msss/01000/mcam/1000ML0044631290305226E03_DXXX.jpg"
-  buildCarrousel(headerArrays,imagen1,imagen2,imagen3)
   #headerArrars.push("\s\s\s\s <a>https://www.nasa.gov/sites/all/themes/custom/nasatwo/images/nasa-logo.svg</a>")
   headerArrays.push("\s\s</header>")
 end
@@ -113,52 +90,106 @@ end
 #Construye el main del html
 def build_Main(mainArrays)
   mainArrays.push("\s\s<main>")
-
+  build_Carrousel(mainArrays) #llama al método que construye al carrousel 
   mainArrays.push("\s\s</main>")
 end
 
-#construye el carrusel
-def buildCarrousel(carrouselArrays,img1,img2,im3)
-  carrouselArrays.push("\s\s\s\s<div id=\"carouselExampleCaptions\" class=\"carousel slide\" data-bs-ride=\"false\">")
-  carrouselArrays.push("\s\s\s\s\s\s<div class=\"carousel-indicators\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s<button type=\"button\" data-bs-target=\"#carouselExampleCaptions\" data-bs-slide-to=\"0\" class=\"active\" aria-current=\"true\" aria-label=\"Slide 1\"></button>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s<button type=\"button\" data-bs-target=\"#carouselExampleCaptions\" data-bs-slide-to=\"1\" aria-label=\"Slide 2\"></button>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s<button type=\"button\" data-bs-target=\"#carouselExampleCaptions\" data-bs-slide-to=\"2\" aria-label=\"Slide 3\"></button>")
+def build_Carrousel(carrouselArrays)
+  carrouselArrays.push("\s\s\s\s<div id=\"carouselExampleIndicators\" class=\"carousel slide\" data-bs-ride=\"carousel\">")
+  
+  #primer grupo de fotos
+  carrouselArrays.push("\s\s\s\s\s\s<div class=\"carousel-item active\">")
+  slid = 1
+  build_Carrousel_Row(carrouselArrays, slid)
   carrouselArrays.push("\s\s\s\s\s\s</div>")
-  carrouselArrays.push("\s\s\s\s\s\s<div class=\"carousel-inner\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s<div class=\"carousel-item active\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s<img src=\"#{img1}\" class=\"d-block w-100\" alt=\"...\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s<div class=\"carousel-caption d-none d-md-block\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<h5>First slide label</h5>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<p>Some representative placeholder content for the first slide.</p>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s</div>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s</div>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s<div class=\"carousel-item\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s<img src=\"#{img2}\" class=\"d-block w-100\" alt=\"...\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s<div class=\"carousel-caption d-none d-md-block\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<h5>Second slide label</h5>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<p>Some representative placeholder content for the second slide.</p>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s</div>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s</div>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s<div class=\"carousel-item\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s<img src=\"#{img1}\" class=\"d-block w-100\" alt=\"...\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s<div class=\"carousel-caption d-none d-md-block\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<h5>Thid slide label</h5>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<p>Some representative placeholder content for the third slide.</p>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s\s\s</div>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s</div>")
+
+  #segundo Grupo de fotos
+  carrouselArrays.push("\s\s\s\s\s\s<div class=\"carousel-item text-dark\">")
+  slid = 5
+  build_Carrousel_Row(carrouselArrays, slid)
   carrouselArrays.push("\s\s\s\s\s\s</div>")
-  carrouselArrays.push("\s\s\s\s\s\s<button class=\"carousel-control-prev\" type=\"button\" data-bs-target=\"carouselExampleCaptions\" data-bs-slide=\"prev\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s<span class=\"carousel-control-prev-icon\" aria-hidden=\"true\"></span>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s<span class=\"visually-hidden\">Previous</span>")
-  carrouselArrays.push("\s\s\s\s\s\s</button>")
-  carrouselArrays.push("\s\s\s\s\s\s<button class=\"carousel-control-next\" type=\"button\" data-bs-target=\"carouselExampleCaptions\" data-bs-slide=\"next\">")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s<span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>")
-  carrouselArrays.push("\s\s\s\s\s\s\s\s<span class=\"visually-hidden\">Next</span>")
-  carrouselArrays.push("\s\s\s\s\s\s</button>")
+
+  #tercer grupo de fotos
+  carrouselArrays.push("\s\s\s\s\s\s<div class=\"carousel-item text-dark\">")
+  slid = 9
+  build_Carrousel_Row(carrouselArrays, slid)
+  carrouselArrays.push("\s\s\s\s\s\s</div>")
+
+  #cuarto Grupo de Fotos
+  carrouselArrays.push("\s\s\s\s\s\s<div class=\"carousel-item text-dark\">")
+  slid = 1
+  build_Carrousel_Row(carrouselArrays, slid)
+  carrouselArrays.push("\s\s\s\s\s\s</div>")
+
+  #quinto grupo de fotos
+  carrouselArrays.push("\s\s\s\s\s\s<div class=\"carousel-item text-dark\">")
+  slid = 1
+  build_Carrousel_Row(carrouselArrays, slid)
+  carrouselArrays.push("\s\s\s\s\s\s</div>")
   carrouselArrays.push("\s\s\s\s</div>")
 end
 
+#construye carrousel este es el que estaba trabajando revisar para integrar lo demas
+# def build_Carrousel(carrouselArrays)
+#   fotosCamera1 = []
+#   carrouselArrays.push("\s\s\s\s<div id=\"carouselExampleIndicators\" class=\"carousel slide\" data-bs-ride=\"carousel\">")
+#   carrouselArrays.push("\s\s\s\s\s\s<div class=\"carousel-item active\">")
+#   slid = 1
+#   nameCamera = "FHAZ" #cámara tipo 1
+#   fotosCamera1.push(filterData($data, nameCamera)) #filtra el archivo por el tipo de cámara indicado
+#   imagen1Arrays = select_Images(fotosCamera1, nameCamera) #metodo para seleccionar imagenes al azar de la cámara 1
+#   puts "byebug de carrousel"
+#   byebug
+#   build_Carrousel_Row(carrouselArrays, imagen1Arrays, slid)
+#   carrouselArrays.push("\s\s\s\s\s\s\s\s</div>")
+#   carrouselArrays.push("\s\s\s\s\s\s\s\s<div class=\"carousel-item text-dark\">")
+#   slid = 5
+#   #cámara tipo 2
+#   nameCamera = "RHAZ"
+#   fotosCamera2 = filterData($data, nameCamera) #filtra el archivo por el tipo de cámara indicado
+#   build_Carrousel_Row(carrouselArrays, imagen2Arrays, slid)
+#   carrouselArrays.push("\s\s\s\s\s\s</div>")
+#   carrouselArrays.push("\s\s\s\s</div>")
+# end
+
+# image1Arrays = "http://mars.jpl.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/01000/opgs/edr/rcam/RLB_486265291EDR_F0481570RHAZ00323M_.JPG"
+#   imagen2Arra = "http://mars.jpl.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/01000/opgs/edr/fcam/FLB_486265257EDR_F0481570FHAZ00323M_.JPG"
+#   imagen3 = "http://mars.jpl.nasa.gov/msl-raw-images/msss/01000/mcam/1000ML0044631290305226E03_DXXX.jpg"
+
+#agrega item al carrousel
+def build_Carrousel_Row(carrouselArraysRow, slid)
+  carrouselArraysRow.push("\s\s\s\s\s\s\s\s<div class=\"row\">")
+  sli = slid
+  build_Carrousel_Img(carrouselArraysRow, sli)
+  sli += 1
+  build_Carrousel_Img(carrouselArraysRow, sli)
+  sli += 1
+  build_Carrousel_Img(carrouselArraysRow, sli)
+  sli += 1
+  build_Carrousel_Img(carrouselArraysRow, sli)
+  carrouselArraysRow.push("\s\s\s\s\s\s\s\s</div>")
+  # carrouselArraysRow.push("\s\s\s\s\s\s</div>")
+  # carrouselArraysRow.push("\s\s\s\s</div>")
+end
+
+#agrega imagen al item carrousel
+def build_Carrousel_Img(carrouselArraysImg, sli)
+  carrouselArraysImg.push("\s\s\s\s\s\s\s\s\s\s<div class=\"col-md-3 col-lg-3\">")
+  #carrouselArraysImg.push("\s\s\s\s\s\s\s\s\s\s\s\s<img src=\"img1\" class=\"img-fluid\" alt=\"slider-#{sli}\">")
+  carrouselArraysImg.push("\s\s\s\s\s\s\s\s\s\s</div>")
+end
+
+def select_Images(arraysPhotosCamera, nameCamera)
+  arraysFotosGroup = []
+  totalFotosCamera = arraysPhotosCamera.count
+  cantFotosRow = 4
+  byebug
+  cantFotosRow.times do |ind|
+    fotoIndice = rand(0..totalFotosCamera).to_i
+    arraysFotosGroup.push(arrayPhotosCamera[ind][3])
+  end
+  return arraysFotosGroup
+end
 #construye el footer del html
 def build_Footer(footerArrays)
   footerArrays.push("\s\s<footer>")
@@ -174,6 +205,30 @@ def build_Index (htmlFinish)
     file.write(lineArray)
   end
 end
+
+#abre archivos como arreglos
+def openFileAsArray(file)
+  dataFile = open(file).read.chomp.split(",")
+end
+
+# def select_Images(data)
+
+#   #camara tipo 3
+#   nameCamera = "MAST"
+#   fotosCamera3 = filterData(data, nameCamera) #filtra el archivo por el tipo de cámara indicado
+
+#   #camara tipo 4
+#   nameCamera = "CHEMCAM"
+#   fotosCamera4 = filterData(data, nameCamera) #filtra el archivo por el tipo de cámara indicado
+
+#   #camara tipo 5
+#   nameCamera = "NAVCAM"
+#   fotosCamera5 = filterData(data, nameCamera) #filtra el archivo por el tipo de cámara indicado
+# end
+
+
+
+
 
 
 def revisa_json(datos)
@@ -209,31 +264,18 @@ def revisa_json(datos)
   #               "full_name": "Front Hazard Avoidance Camera"
   #           }}]}
 end
-#main
-keyApi = ARGV[0].to_s
-urlApi = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&api_key="
-#keyApi = requestKey(keySecret)
-data = request(urlApi, keyApi) #metodo genera el request
-nameCamera = "FHAZ"
-dataFilter = filterData(data, nameCamera) #filtra el archivo por el tipo de cámara indicado
-print "#{dataFilter}\n"
-print "total fotos #{dataFilter.count} \n"
-print dataFilter.class
-print "clase de data #{data.class} \n"
-build_web_pages #metodo construye pagina
 
-# print cameras
+#principal
 
+def main_Program
+  #keyApi = ARGV[0].to_s
+  # urlApi = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&api_key="
+  # $data = request(urlApi, KEYAPI) #metodo genera el request
+  build_web_pages #metodo construye pagina
+end
 
+#definicion de constantes y variables
+KEYAPI = ARGV[0].to_s #creamos una constante con la keyapi ingresada
+$data = "" #defino una variable global para almacenar el json parseado
 
-#photos = data.map{|x| x["img_src"]}#
-# photos = [[["id: value"]]]
-#camaras = data.map{|x| x["name"]}
-# html = ""
-# photos[0..5].each do |photo|
-#     html += "<img src=\"#{photo}\">\n"
-# end
-#File.write('output.html',html)
-#print camaras
-# print photos
-# puts data.class
+main_Program

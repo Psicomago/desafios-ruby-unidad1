@@ -109,9 +109,9 @@ end
 def build_Card(cardArrays)
   cardCam = []
   cardArrays.push("\s\s\s\s\s\s<div class=\"row row-cols-1 row-cols-md-3 g-4\">")
-  # esta linea reemplaza el metodo photos_count, me pareció más práctico e interesante resolverlo de esta manera
-  hashCam = $dataFilter.group_by{ |ele, value| ele["nameF"] }.transform_values{ |values| values.count }
-  
+  # esta linea reemplaza el metodo photos_count, me pareció más práctico e interesante resolverlo de esta manera, no obtante se incluyó el metodo
+  #hashCam = $dataFilter.group_by{ |ele, value| ele["nameF"] }.transform_values{ |values| values.count }
+  hashCam = photos_Count() 
   cameras = ["FHAZ", "RHAZ", "MAST", "CHEMCAM", "NAVCAM"]
   arrayCam = hashCam.to_a #se trasnforma el hash, que contiene la cantidad de fotos tomadas,por cada cámara, en arreglo.
   hashCam.count.times do |ind| #inicia un times de 5 tiempos 
@@ -123,6 +123,9 @@ def build_Card(cardArrays)
   cardArrays.push("\s\s\s\s\s\s</div>")
 end
 
+def photos_Count()
+  hashCamCount = $dataFilter.group_by{ |ele, value| ele["nameF"] }.transform_values{ |values| values.count }
+end
 #construye el footer del html
 def build_Footer(footerArrays)
   footerArrays.push("\s\s<footer class=\"bg-dark mt-5 text-center\">")

@@ -143,15 +143,17 @@ Los aprendizajes alcanzados fueron:
 
     Entre las cosas que logré mejorar fue en la utilización de algunos metodos que permiten reducir la cantidad de lineas de codigo. 
 
-    Por lo mismo, para contar la cantidad de fotografías tomadas con cada cámara, en vez de escribir el metodo photos_count, utilicé la siguiente linea:
+    Por lo mismo, para contar la cantidad de fotografías tomadas con cada cámara, en primera instancia, en vez de escribir el metodo photos_count, utilicé la siguiente linea: 
 
         hashCam = $dataFilter.group_by{ |ele, value| ele["nameF"] }.transform_values{ |values| values.count }
+
+    posteriormente, decidí crear el metodo requerido, photos_Count e incluir dicha linea en el metodo.
 
         Esta linea simplifica mucho el codigo y se explica de la siguiente manera.
 
         a la variable global $dataFilter le aplicamos el metodo group_by el cual devuelve un hash que será almacenado en hashCam, de clase hash. 
 
-        la conidición ingresada entre las {} es que cada elemento de $dataFilter lo agrupará por la clave "nameF" y con transform_values contará todos los elementos que se agrupen bajo cada clave y se lo asignará como valor.
+        la conidición ingresada entre las {} es, que cada elemento de $dataFilter lo agrupará por la clave "nameF" y con transform_values contará todos los elementos que se agrupen bajo cada clave y se lo asignará como valor.
 
         el resultado de este hash fue el nombre corto de cada cámara y la cantida de fotos que se tomaron con  ella. 
 

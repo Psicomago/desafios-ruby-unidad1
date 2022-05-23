@@ -27,9 +27,9 @@ def build_web_pages
   pagesIndex = build_Html #asigna el resultado del método build_html a pagesIndex
   pagesIndex = build_Head(pagesIndex) #asigna a pages index el retorno del metodo buildHead
   pagesIndex = build_Body(pagesIndex) #asigna a pages index el retorno del metodo buildBody
-  build_Index(pagesIndex) #
-  return pagesIndex
+  build_Index(pagesIndex)
 end
+
 def build_Html
   htmlArrays = Array.new
   htmlArrays.push("<!DOCTYPE html>")
@@ -68,54 +68,66 @@ end
 def build_Header(headerArrays)
   headerArrays.push("\s\s<header class=\"bg-dark\">")
   build_Navbar(headerArrays)
-  # headerArrays.push("\s\s<a>")
-  # headerArrays.push("\s\s\s\s<img src=\"https://www.nasa.gov/sites/all/themes/custom/nasatwo/images/nasa-logo.svg\" alt=\"\" width=\"53\" height=\"100\">")
-  # headerArrays.push("\s\s\s\s<h1 class=\"text-white bg-dark text-center d-inline\">FOTOGRAFÍAS API NASA</h1>")
-  # headerArrays.push("\s\s</a>")
+  build_Carousel(headerArrays) #llama al método que construye al carrousel 
   headerArrays.push("\s\s</header>")
 end
 
 def build_Navbar(navbarArrays)
-  navbarArrays.push("\s\s\s\s<nav class=\"navbar navbar-light bg-transparent fixed-top\">")
+  navbarArrays.push("\s\s\s\s<nav class=\"navbar navbar-light bg-dark fixed-top\">")
   navbarArrays.push("\s\s\s\s\s\s<div class=\"container-fluid px-5\">")
   navbarArrays.push("\s\s\s\s\s\s\s\s<div class=\"d-inline\">")
   navbarArrays.push("\s\s\s\s\s\s\s\s\s\s<a class=\"navbar-brand text-white fs-6\" href=\"#\">")
   navbarArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<img src=\"https://www.nasa.gov/sites/all/themes/custom/nasatwo/images/nasa-logo.svg\" alt=\"\" width=\"auto\" height=\"24\" class=\"d-inline align-text-top\"> Api Nasa")
   navbarArrays.push("\s\s\s\s\s\s\s\s\s\s</a>")
   navbarArrays.push("\s\s\s\s\s\s\s\s</div>")
-      #<!-- botones menú -->
-      # <div class="d-inline">
-      #   <ul class="nav justify-content-end">
-      #     <li class="nav-item">
-      #       <a class="nav-link active text-white" aria-current="page" href="#">Inicio</a>
-      #     </li>
-      #     <li class="nav-item d-none d-md-block">
-      #       <a class="nav-link text-white" href="#quienes_somos">Quienes Somos</a>
-      #     </li>
-      #     <li class="nav-item">
-      #       <a class="nav-link text-white" href="#destacados">Destacados</a>
-      #     </li>
-      #     <li class="nav-item">
-      #       <a class="nav-link text-white" href="#contacto">Contacto</a>
-      #     </li>
-      #   </ul>
-      # </div>
   navbarArrays.push("\s\s\s\s\s\s</div>")
   navbarArrays.push("\s\s\s\s</nav>")
 end
 
+
 #Construye el main del html
 def build_Main(mainArrays)
   mainArrays.push("\s\s<main>")
-  mainArrays.push("\s\s\s\s<section>")
-  build_Carousel(mainArrays) #llama al método que construye al carrousel 
+  mainArrays.push("\s\s\s\s<section class = \"container mt-5\">")
+  build_Card(mainArrays)
   mainArrays.push("\s\s\s\s</section>")
   mainArrays.push("\s\s</main>")
+end
+def card_Item(cardItemArrays, cardCam, totalFotos)
+  cardItemArrays.push("\s\s\s\s\s\s\s\s<div class=\"col\">")
+  cardItemArrays.push("\s\s\s\s\s\s\s\s\s\s<div class=\"card\">")
+  cardItemArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<img src=\"#{cardCam["linkImagen"]}\" class=\"card-img-top\" alt=\"...\">")
+  cardItemArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<div class=\"card-body\">")
+  cardItemArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s\s\s<h5 class=\"card-title\"> #{cardCam["fullNameF"]}</h5>")
+  cardItemArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s\s\s<p class=\"card-text\">Total Fotos tomadas #{totalFotos}</p>")
+  cardItemArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s</div>")
+  cardItemArrays.push("\s\s\s\s\s\s\s\s\s\s</div>")
+  cardItemArrays.push("\s\s\s\s\s\s\s\s</div>")
+end
+
+#constuye cada tarjeta
+def build_Card(cardArrays)
+  cardCam = []
+  cardArrays.push("\s\s\s\s\s\s<div class=\"row row-cols-1 row-cols-md-3 g-4\">")
+  # esta linea reemplaza el metodo photos_count, me pareció más práctico e interesante resolverlo de esta manera
+  hashCam = $dataFilter.group_by{ |ele, value| ele["nameF"] }.transform_values{ |values| values.count }
+  
+  cameras = ["FHAZ", "RHAZ", "MAST", "CHEMCAM", "NAVCAM"]
+  arrayCam = hashCam.to_a #se trasnforma el hash, que contiene la cantidad de fotos tomadas,por cada cámara, en arreglo.
+  hashCam.count.times do |ind| #inicia un times de 5 tiempos 
+    cardCam.clear # se limpia el arreglo que contendra las conicidencia verdaderas en el map
+    $dataFilter.map{|ele|  cardCam.push(ele) if ele["nameF"] == cameras[ind]} #se busca coincidencia de cámaras y asigna el elelmento al arreglo cardCam
+    totalFotos = arrayCam[ind][1] if arrayCam[ind][0] == cameras[ind] #se asigna la cantidad de fotos de la cámara evaluada.
+    card_Item(cardArrays, cardCam[0], totalFotos) #los parametros pasados son el arreglo que lleva el codigo html, la primera foto de cada cámara y el total de fotos tomadas
+  end
+  cardArrays.push("\s\s\s\s\s\s</div>")
 end
 
 #construye el footer del html
 def build_Footer(footerArrays)
-  footerArrays.push("\s\s<footer class=\"bg-dark\">")
+  footerArrays.push("\s\s<footer class=\"bg-dark mt-5 text-center\">")
+  footerArrays.push("\s\s\s\s<img src=\"https://www.nasa.gov/sites/all/themes/custom/nasatwo/images/nasa-logo.svg\" alt=\"\" width=\"auto\" height=\"40\" class=\"d-inline align-text-top text-white\">")
+  footerArrays.push("\s\s\s\s<h3 class = \"text-center text-white fs-5 d-inline\">https://www.nasa.gov/</h3>")
   footerArrays.push("\s\s</footer>")
 end
 
@@ -128,24 +140,41 @@ def build_Index (htmlFinish)
     file.write(lineArray)
   end
 end
+
+def build_Button_Indicators(carouselButton)
+  ntimes = 9
+  numSlideTo = 1
+  numSlide = numSlideTo + 1
+  ntimes.times do |ind|
+    carouselButton.push("\s\s\s\s\s\s\s\s\s\s<button type=\"button\" data-bs-target=\"#carouselExampleDark\" data-bs-slide-to=\"#{numSlideTo}\" aria-label=\"Slide #{numSlide}\"></button>")
+    numSlideTo += 1
+    numSlide = numSlideTo + 1
+  end
+end
+
 def build_Carousel(carouselArrays)
-  carouselArrays.push("\s\s\s\s\s\s<div id=\"carouselExampleControls\" class=\"carousel slide\" data-bs-ride=\"carousel\">")
+  carouselArrays.push("\s\s\s\s\s\s<div id=\"carouselExampleDark\" class=\"carousel carousel-dark slide\" data-bs-ride=\"carousel\">")
+  # Boton n°1
+  carouselArrays.push("\s\s\s\s\s\s\s\s<div class=\"carousel-indicators\">")
+  carouselArrays.push("\s\s\s\s\s\s\s\s\s\s<button type=\"button\" data-bs-target=\"#carouselExampleDark\" data-bs-slide-to=\"0\" class=\"active\" aria-current=\"true\" aria-label=\"Slide 1\"></button>")
+  # botones desde el 2 al 10
+  build_Button_Indicators(carouselArrays)
+  carouselArrays.push("\s\s\s\s\s\s\s\s</div>")
+  #interior carousel
   carouselArrays.push("\s\s\s\s\s\s\s\s<div class=\"carousel-inner\">")
   cameras = ["FHAZ", "RHAZ", "MAST", "CHEMCAM", "NAVCAM"]
   #foto N°1
-  estado = "active"
+  estado = "<div class=\"carousel-item active\" data-bs-interval=\"10000\">"
   indiceFoto = 0
   numFoto = 0
   imageSelect = $dataFilter.select{|ele| ele["nameF"] == cameras[indiceFoto]} #selecciona imagen según camera
-  #print "indice #{indiceFoto}  #{imageSelect[numFoto]}  numFoto #{numFoto}\n\n"
   carousel_Item(carouselArrays, estado, imageSelect[numFoto])
   numFoto += 1
   #foto fotos desde 2 a 10
   nFotos = 9
   nFotos.times do |idx|
-    estado = ""
+    estado = "<div class=\"carousel-item\" data-bs-interval=\"2000\">"
     imageSelect = $dataFilter.select{|ele| ele["nameF"] == cameras[indiceFoto]} #selecciona imagen según camera
-    #print "#{idx} = indice #{indiceFoto}  #{imageSelect[numFoto]}  numFoto #{numFoto}\n\n"
     carousel_Item(carouselArrays, estado, imageSelect[numFoto])
     numFoto += 1
     if numFoto > 1 
@@ -154,11 +183,11 @@ def build_Carousel(carouselArrays)
     end
   end
   carouselArrays.push("\s\s\s\s\s\s\s\s</div>")
-  carouselArrays.push("\s\s\s\s\s\s\s\s<button class=\"carousel-control-prev\" type=\"button\" data-bs-target=\"#carouselExampleControls\" data-bs-slide=\"prev\">")
+  carouselArrays.push("\s\s\s\s\s\s\s\s<button class=\"carousel-control-prev\" type=\"button\" data-bs-target=\"#carouselExampleDark\" data-bs-slide=\"prev\">")
   carouselArrays.push("\s\s\s\s\s\s\s\s\s\s<span class=\"carousel-control-prev-icon\" aria-hidden=\"true\"></span>")
   carouselArrays.push("\s\s\s\s\s\s\s\s\s\s<span class=\"visually-hidden\">Previous</span>")
   carouselArrays.push("\s\s\s\s\s\s\s\s</button>")
-  carouselArrays.push("\s\s\s\s\s\s\s\s<button class=\"carousel-control-next\" type=\"button\" data-bs-target=\"#carouselExampleControls\" data-bs-slide=\"next\">")
+  carouselArrays.push("\s\s\s\s\s\s\s\s<button class=\"carousel-control-next\" type=\"button\" data-bs-target=\"#carouselExampleDark\" data-bs-slide=\"next\">")
   carouselArrays.push("\s\s\s\s\s\s\s\s\s\s<span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>")
   carouselArrays.push("\s\s\s\s\s\s\s\s\s\s<span class=\"visually-hidden\">Next</span>")
   carouselArrays.push("\s\s\s\s\s\s\s\s</button>")
@@ -166,20 +195,18 @@ def build_Carousel(carouselArrays)
 end
 
 def carousel_Item(carouselItemsArrays, estado, imageSel)
-  #print "lo que paso al item  #{imageSel}  \n\n"
-  carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s<div class=\"carousel-item #{estado}\">")
+  carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s#{estado}>")
   carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<img src=\"#{imageSel["linkImagen"]}\" class=\"d-block w-100\" alt=\"...\">")
-  # carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<div class=\"carousel-caption\">")
-  # carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s\s\s<h5>Fotografia Tomada con #{imageSel["fullNameF"]}</h5>")
-  # carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s\s\s<p>en Fecha de la tierra #{imageSel["dateF"]}</p>")
-  # carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<div>")
+  carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s<div class=\"carousel-caption d-block\">")
+  carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s\s\s<h5 class=\"text-white\">Fotografía tomada con #{imageSel["fullNameF"]}</h5>")
+  carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s\s\s<p class=\"text-white\">Con fecha #{imageSel["dateF"]}</p>")
+  carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s\s\s</div>")
   carouselItemsArrays.push("\s\s\s\s\s\s\s\s\s\s</div>")
 end
 
-
 #principal
 # filtrar data por el tipo de camara
-def filterData(dataJob) 
+def filter_Data(dataJob) 
   arraysFilter = []
   idx = 1 #indice que sera asiganado a cada elemento del arreglo
   dataJob["photos"].each do |ele|
@@ -189,7 +216,6 @@ def filterData(dataJob)
     "linkImagen" => ele["img_src"],
     "dateF" => ele["earth_date"]
     }) 
-    #print "#{arraysFilter}\n"
     idx += 1
   end
   return arraysFilter
@@ -198,16 +224,13 @@ end
 def main_Program
   urlApi = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&api_key="
   $data = request(urlApi, KEYAPI) # asigna a una variable global el retorno del metodo que genera el request
-  $dataFilter = filterData($data) #asigna al arreglo global el retorno de datos filtrados
-  #print $dataFilter
-  # puts $dataFilter.count
-  # puts $dataFilter.class
+  $dataFilter = filter_Data($data) #asigna al arreglo global el retorno de datos filtrados
   build_web_pages #metodo construye pagina
 end
 
 #definicion de constantes y variables
-KEYAPI = ARGV[0] #creamos una variable Globalconstante con la keyapi ingresada
-$data = "" #defino una variable global para almacenar el json parseado
+KEYAPI = ARGV[0] #creamos una constante global con la keyapi ingresada
+$data = "" #se define una variable global para almacenar el json parseado
 $dataFilter = [] #arreglo de trabajo
 
 main_Program
